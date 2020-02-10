@@ -1,11 +1,15 @@
 # '''
 # Linked List hash table key/value pair
 # '''
+
 class LinkedPair:
     def __init__(self, key, value):
         self.key = key
         self.value = value
         self.next = None
+
+    def __repr__(self):
+        return self.key + ' ' + self.value + '  ' + str(self.next)
 
 class HashTable:
     '''
@@ -51,7 +55,18 @@ class HashTable:
 
         Fill this in.
         '''
-        pass
+        # print(self.storage, len(self.storage))
+        index = self._hash_mod(key)
+        node = self.storage[index]
+        if node is None:
+            self.storage[index] = LinkedPair(key, value)
+        else:
+            # print("Current node: ", node)
+            # print(self.storage[index].__repr__())
+            while node.next is not None:
+                node = node.next
+            node.next = LinkedPair(key, value)
+            # print("Now node: ", node, "adding this: ", node.next)
 
 
 
@@ -63,7 +78,18 @@ class HashTable:
 
         Fill this in.
         '''
-        pass
+        print("trying to remove...", key)
+        if (self.retrieve(key) is not None):
+            print("match found")
+            index = self._hash_mod(key)
+            node = self.storage[index]
+            while node.key != key and node.next is not None:
+                node = node.next
+            if (node.key == key):
+                print(node.key, key, node.value)
+                node.value == None
+        else:
+            print("Key was not found...")
 
 
     def retrieve(self, key):
@@ -74,7 +100,20 @@ class HashTable:
 
         Fill this in.
         '''
-        pass
+        print("Trying to retrieve...")
+        index = self._hash_mod(key)
+        node = self.storage[index]
+        print(node.__repr__())
+        print(key, "lookit",  node.key)
+        if node is not None:
+            while node.key != key and node.next is not None:
+                node = node.next
+                print("New node is", node)
+            if (node.key == key):
+                print("A match!", node.key, key, node.value)
+                return node.value
+        else:
+            return None
 
 
     def resize(self):
