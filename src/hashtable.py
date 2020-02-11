@@ -36,7 +36,11 @@ class HashTable:
 
         OPTIONAL STRETCH: Research and implement DJB2
         '''
-        pass
+        # def hash_djb2(s):   
+        hash = 5381
+        for x in key:
+            hash = (( hash << 5) + hash) + ord(x)
+        return hash & 0xFFFFFFFF
 
 
     def _hash_mod(self, key):
@@ -61,12 +65,22 @@ class HashTable:
         if node is None:
             self.storage[index] = LinkedPair(key, value)
         else:
-            # print("Current node: ", node)
-            # print(self.storage[index].__repr__())
-            while node.next is not None:
-                node = node.next
-            node.next = LinkedPair(key, value)
-            # print("Now node: ", node, "adding this: ", node.next)
+            print("Collision!", node, key)
+            if (node.key == key):
+                node.value = value
+                return
+            else:
+                # print("Searching...node.next is: ", node.next)
+                while node.next is not None:
+                    if (node.key == key):
+                        node.value = value
+                        break
+                    else:
+                        node = node.next
+                if (node.key == key):
+                        node.value = value
+                        return
+                node.next = LinkedPair(key, value)
 
 
 
@@ -78,16 +92,14 @@ class HashTable:
 
         Fill this in.
         '''
-        print("trying to remove...", key)
         if (self.retrieve(key) is not None):
-            print("match found")
             index = self._hash_mod(key)
             node = self.storage[index]
-            while node.key != key and node.next is not None:
-                node = node.next
+            while node.key != key:
+                if node.next is not None:
+                    node = node.next
             if (node.key == key):
-                print(node.key, key, node.value)
-                node.value == None
+                node.value = None
         else:
             print("Key was not found...")
 
@@ -100,17 +112,12 @@ class HashTable:
 
         Fill this in.
         '''
-        print("Trying to retrieve...")
         index = self._hash_mod(key)
         node = self.storage[index]
-        print(node.__repr__())
-        print(key, "lookit",  node.key)
         if node is not None:
             while node.key != key and node.next is not None:
                 node = node.next
-                print("New node is", node)
             if (node.key == key):
-                print("A match!", node.key, key, node.value)
                 return node.value
         else:
             return None
@@ -123,7 +130,16 @@ class HashTable:
 
         Fill this in.
         '''
-        pass
+        self.capacity = self.capacity * 2
+        old_storage = self.storage
+        self.storage = self.capacity * [None]
+        print(old_storage)
+        for i in old_storage:
+            if i is not None:
+                while i.next is not None:
+                    self.insert(i.key, i.value)
+                    i = i.next
+                self.insert(i.key, i.value)
 
 
 
@@ -146,7 +162,7 @@ if __name__ == "__main__":
     ht.resize()
     new_capacity = len(ht.storage)
 
-    print(f"\nResized from {old_capacity} to {new_capacity}.\n")
+    # print(f"\nResized from {old_capacity} to {new_capacity}.\n")
 
     # Test if data intact after resizing
     print(ht.retrieve("line_1"))
